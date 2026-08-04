@@ -1,0 +1,8 @@
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "C901"]   # errors, pyflakes, and mccabe complexity
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10           # >10 = refactor, per the doc

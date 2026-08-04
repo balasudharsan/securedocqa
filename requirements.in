@@ -1,0 +1,20 @@
+# runtime
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
+pypdf
+qdrant-client
+groq
+google-genai
+slowapi
+python-dotenv
+
+# dev / test
+pytest
+pytest-asyncio
+httpx
+ruff
+bandit
+pip-audit
