@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  security-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history so gitleaks can scan it all
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint + complexity (ruff)
+        run: ruff check .
+
+      - name: Static security analysis (bandit)
+        run: bandit -r app -ll        # -ll = report medium+ severity
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit -r requirements.txt
+
+      - name: Tests (pytest)
+        env:                          # dummy env so config.py doesn't fail-fast in CI
+          QDRANT_URL: "https://dummy.example.com:6333"
+          QDRANT_API_KEY: "ci-dummy"
+          GROQ_API_KEY: "ci-dummy"
+          GEMINI_API_KEY: "ci-dummy"
+          DEMO_API_KEY: "ci-dummy"
+        run: pytest
